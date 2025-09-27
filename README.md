@@ -1,9 +1,7 @@
 # ettesal
-websocket written in golang
-
 <div align="center">
 
-  <img src="misc/readme/ettesal1.svg" />
+  <img src="misc/readme/banner.svg" />
 
 </br>
 </br>
