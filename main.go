@@ -1,41 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"embed"
 
-	"github.com/gorilla/websocket"
+	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-var upgrader = websocket.Upgrader{}
-
-func wsHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Println("Upgrade error:", err)
-		return
-	}
-	defer conn.Close()
-
-	for {
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
-			fmt.Println("Read error:", err)
-			break
-		}
-		fmt.Println("Received:", string(msg))
-		conn.WriteMessage(websocket.TextMessage, []byte("Echo: "+string(msg)))
-	}
-}
-
-func restHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("This is a REST API response"))
-}
+//go:embed all:frontend/dist
+var assets embed.FS
 
 func main() {
-	http.HandleFunc("/ws", wsHandler)    // WebSocket endpoint
-	http.HandleFunc("/api", restHandler) // REST API endpoint
+	// Create an instance of the app structure
+	app := NewApp()
 
-	fmt.Println("Server running on http://localhost:3000")
-	http.ListenAndServe(":3000", nil)
+	// Create application with options
+	err := wails.Run(&options.App{
+		Title:  "myproject",
+		Width:  1024,
+		Height: 768,
+		AssetServer: &assetserver.Options{
+			Assets: assets,
+		},
+		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		OnStartup:        app.startup,
+		Bind: []interface{}{
+			app,
+		},
+	})
+
+	if err != nil {
+		println("Error:", err.Error())
+	}
 }

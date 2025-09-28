@@ -10,3 +10,11 @@ A lightweight and efficient socket package in Go for communication services, bui
 </div>
 
 ---
+
+
+## to install wails
+```go install github.com/wailsapp/wails/v2/cmd/wails@latest```
+
+
+## to run application
+```wails dev```
