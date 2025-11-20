@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 )
 
 // App struct
@@ -22,6 +24,23 @@ func (a *App) startup(ctx context.Context) {
 }
 
 // Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+func (a *App) Greet(url string) string {
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println("error:", err)
+		return ""
+	}
+	defer res.Body.Close()
+
+	// Read all body
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("read error:", err)
+		return ""
+	}
+
+	// fmt.Println("Status:", res.Status)
+	// fmt.Println("Body:", string(body))
+
+	return string(body)
 }
